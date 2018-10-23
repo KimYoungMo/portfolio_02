@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org./dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.tj.dao.BoardAttachDao">
+
+<!-- [1] 첨부파일 등록 -->
+	<insert id="inputFile" parameterType="Map" useGeneratedKeys="true" keyProperty="fileIdx">
+		INSERT INTO board_attach (`type_seq`, `board_seq`, `file_name`, `fake_filename`, `file_size`, `file_type`, `save_loc`, `create_date`)
+		VALUES (
+					#{typeSeq},
+					#{boardSeq},
+					#{fileName}, 
+					#{fakeName}, 
+					#{fileSize}, 
+					#{fileType}, 
+					'asd', 
+					NOW() 
+				)
+	</insert>
+
+	<select id="getFile" parameterType="int" resultType="Map">
+		SELECT * FROM board_attach WHERE board_seq = #{0} AND type_seq = #{1}
+	</select>
+	
+	<select id="getFile2" parameterType="int" resultType="Map">
+		SELECT * FROM board_attach WHERE board_seq = #{0} AND type_seq = #{1}
+	</select>
+
+	<select id="download" parameterType="Map" resultType="Map">
+		SELECT * FROM board_attach WHERE file_idx = #{fileIdx}
+	</select>
+
+	<delete id="deleteAttach" parameterType="int">
+	<!-- 코드요정 왔다감. 간바레 탈모쿤!!-->
+		DELETE FROM board_attach WHERE file_idx = #{0} 
+	</delete>
+	
+	<!-- [9] has_file이 1이면, 첨부파일 삭제 -->
+	<delete id="deleteHasFile" parameterType="int">
+		DELETE FROM board_attach  WHERE board_seq=#{0} AND type_seq=#{1}
+	</delete>
+
+</mapper>

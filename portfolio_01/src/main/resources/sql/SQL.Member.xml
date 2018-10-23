@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org./dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.kym.pf.dao.MemberDao">
+
+	<!-- [1] 회원가입 -->
+	<insert id="join" parameterType="map">
+		INSERT INTO member (`type_seq`, `member_id`, `member_pw`, `member_name`, `member_nick`, `email`, `birth_date`, `create_date`) 
+		VALUES (1, #{memberId}, SHA2(MD5(#{memberPw}),512), #{memberName}, #{memberNick}, #{email}, #{birth}, NOW())
+	</insert>
+	
+	<!-- [2] ID 증복체크 -->
+	<select id="checkId" parameterType="Map" resultType="int">
+		SELECT COUNT(member_idx) FROM member WHERE member_id = #{memberId}
+	</select>
+	
+	<!-- [3] 회원 ID 검색 -->
+	<select id="findMemberId" parameterType="map" resultType="map">
+		SELECT * FROM member WHERE member_id = #{memberId}
+	</select>
+	
+	<!-- [4] pw -> 암호문 생성 -->
+	<select id="makeCipherText" parameterType="map" resultType="String">
+		SELECT SHA2(MD5(#{memberPw}), 512)
+	</select>
+	
+	<!-- [5] 회원관리 리스트 호출-->
+	<select id="mList" parameterType="map" resultType="map">
+		SELECT member_idx AS memberIdx, member_id AS memberId, member_nick AS memberNick, member_name AS memberName, email, birth_date AS birth, DATE_FORMAT(create_date, '%Y-%m-%d') AS createDate
+		FROM member
+		<if test="searchType != null and searchType == 1">
+			WHERE `member_id` LIKE CONCAT('%', #{searchText}, '%') OR `member_nick` LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+		<if test="searchType != null and searchType == 2">
+			WHERE `member_id` LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+		<if test="searchType != null and searchType == 3">
+			WHERE `member_nick` LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+		ORDER BY ${sidx} ${sord}
+		LIMIT ${startIdx}, ${rows}
+	</select>
+	
+	<!-- [6] 회원관리 리스트 전체 카운트-->
+	<select id="mListCount" parameterType="map" resultType="int">
+		SELECT count(member_idx) FROM member
+		<if test="searchType != null and searchType == 1">
+			WHERE `member_id` LIKE CONCAT('%', #{searchText}, '%') OR `member_nick` LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+		<if test="searchType != null and searchType == 2">
+			WHERE `member_id` LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+		<if test="searchType != null and searchType == 3">
+			WHERE `member_nick` LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+	</select>
+	
+	<!-- [7] 회원관리 리스트에서 회원삭제 -->
+	<delete id="delMember" parameterType="map">
+		DELETE FROM member WHERE member_idx = ${memberIdx}
+	</delete>
+	
+</mapper>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org./dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.kym.pf.dao.BoardAttachDao">
+
+<!-- [1] 첨부파일 등록 -->
+	<insert id="inputFile" parameterType="Map" useGeneratedKeys="true" keyProperty="fileIdx">
+		INSERT INTO board_attach (`type_seq`, `board_seq`, `file_name`, `fake_filename`, `file_size`, `file_type`, `save_loc`, `create_date`)
+		VALUES (#{typeSeq}, #{boardSeq}, #{fileName}, #{fakeName}, #{fileSize}, #{fileType}, 'save_location', NOW() )
+	</insert>
+	
+<!-- [2] 첨부파일 갖고오기 -->
+	<select id="getFile" parameterType="int" resultType="map">
+		SELECT * FROM board_attach WHERE board_seq = #{0} AND type_seq = #{1}
+	</select>
+
+<!-- [3] 첨부파일 다운로드 -->
+	<select id="download" parameterType="Map" resultType="Map">
+		SELECT * FROM board_attach WHERE file_idx = #{fileIdx}
+	</select>
+
+<!-- [4] 첨부파일 삭제 -->	
+	<delete id="deleteAttach" parameterType="int">
+		DELETE FROM board_attach WHERE file_idx = #{0} 
+	</delete>
+
+</mapper>
